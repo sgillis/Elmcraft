@@ -1,5 +1,7 @@
 module Display.Cube where
 
+import Model
+
 import Math.Vector2 (Vec2)
 import Math.Vector3 (..)
 import Math.Matrix4 (..)
@@ -10,10 +12,11 @@ type Vertex = { position:Vec3
               , texCoord:Vec3
               }
 
-cube : Mat4 -> Texture -> Entity
-cube camera texture =
+cube : Texture -> Mat4 -> Model.Block -> Entity
+cube texture camera block =
     entity vertexShader fragmentShader cubeMesh
         { camera=camera
+        , translation=block.translation
         , light=(vec3 20 20 20) 
         , texture=texture
         }
@@ -35,16 +38,16 @@ rotateFace (anglex, angley) =
 
 face : Mat4 -> Vec3 -> [Triangle Vertex]
 face transform topLeftCoord =
-  let topLeft     = Vertex (vec3 -1  1 1)
+  let topLeft     = Vertex (vec3 -0.5  0.5 0.5)
                            (vec3 0 0 1)
                            topLeftCoord
-      topRight    = Vertex (vec3  1  1 1)
+      topRight    = Vertex (vec3  0.5  0.5 0.5)
                            (vec3 0 0 1)
                            (topLeftCoord `add` (vec3 0.25 0 0))
-      bottomLeft  = Vertex (vec3 -1 -1 1)
+      bottomLeft  = Vertex (vec3 -0.5 -0.5 0.5)
                            (vec3 0 0 1)
                            (topLeftCoord `add` (vec3 0 -0.25 0))
-      bottomRight = Vertex (vec3  1 -1 1)
+      bottomRight = Vertex (vec3  0.5 -0.5 0.5)
                            (vec3 0 0 1)
                            (topLeftCoord `add` (vec3 0.25 -0.25 0))
   in
@@ -62,7 +65,7 @@ transformMesh mesh t =
 
 -- Shaders
 vertexShader : Shader Vertex
-                      { u | camera:Mat4 }
+                      { u | camera:Mat4, translation:Mat4 }
                       { n:Vec3, v:Vec3, vcoord:Vec2 }
 vertexShader = [glsl| 
 
@@ -73,16 +76,17 @@ attribute vec3 normal;
 attribute vec3 texCoord;
 
 uniform mat4 camera;
+uniform mat4 translation;
 
 varying vec3 v;
 varying vec3 n;
 varying vec2 vcoord;
 
 void main () {
-    v = position;
-    n = normal;
+    v = vec3(translation * vec4(position, 1.0));
+    n = vec3(vec4(normal, 1.0));
     vcoord = texCoord.xy;
-    gl_Position = camera * vec4(position, 1);
+    gl_Position = camera * translation * vec4(position, 1);
 }
 
 |]

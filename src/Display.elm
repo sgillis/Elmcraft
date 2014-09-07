@@ -9,10 +9,10 @@ import Model
 import Display.World (ground)
 import Display.Cube (cube)
 
-scene : (Int, Int) -> Model.Person -> Response Texture-> Element
-scene (w, h) person texture =
+scene : (Int, Int) -> Model.Person -> Response Texture -> Model.Blocks -> Element
+scene (w, h) person texture blocks =
     layers [ color (rgb 135 206 235) (spacer w h)
-           , webgl (w,h) <| entities (view (w,h) person) texture
+           , webgl (w,h) <| entities (view (w,h) person) texture blocks
            , container w h topLeft <| flow down
                 [ vectorToText person.position
                 , vectorToText <| Model.direction person
@@ -20,10 +20,10 @@ scene (w, h) person texture =
                 ]
            ]
 
-entities : Mat4 -> Response Texture -> [Entity]
-entities view response =
+entities : Mat4 -> Response Texture -> Model.Blocks -> [Entity]
+entities view response blocks =
     case response of
-        Success texture -> [cube view texture]
+        Success texture -> map (cube texture view) blocks
         _               -> []
 
 view : (Int, Int) -> Model.Person -> Mat4

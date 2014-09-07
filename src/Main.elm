@@ -33,8 +33,11 @@ inputs =
 person : Signal Model.Person
 person = foldp Update.step Model.defaultPerson inputs
 
+world : Signal Model.Blocks
+world = constant Model.initialWorld
+
 -- Main
 main : Signal Element
 main =
     let texture=loadTexture "resources/texture.png"
-    in Display.scene <~ Window.dimensions ~ person ~ texture
+    in Display.scene <~ Window.dimensions ~ person ~ texture ~ world
