@@ -14,9 +14,9 @@ scene (w, h) person texture =
     layers [ color (rgb 135 206 235) (spacer w h)
            , webgl (w,h) <| entities (view (w,h) person) texture
            , container w h topLeft <| flow down
-                [ vectorToText person.position
-                , vectorToText <| Model.direction person
-                , vectorToText person.velocity
+                [ plainText "Click the screen to capture the mouse and look around."
+                , plainText "Move around with the WASD keys"
+                , plainText "Go up with space, down with shift"
                 ]
            ]
 
