@@ -1,0 +1,7 @@
+build/*
+cache/*
+elm_dependencies/*
+cabal.sandbox.config
+.cabal-sandbox/*
+
+*.swp
